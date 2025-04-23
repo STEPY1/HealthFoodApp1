@@ -1,6 +1,6 @@
-# HealthFoodApp 🍱
+# HealthFoodApp1 🍱
 
-Ứng dụng đặt đồ ăn lành mạnh, phát triển bằng .NET MAUI với mục tiêu mang đến trải nghiệm mượt mà và tiện lợi cho người dùng.
+Ứng dụng đặt đồ ăn lành mạnh, phát triển bằng .NET MAUI, nhằm mang đến trải nghiệm mượt mà và tiện lợi cho người dùng.
 
 ## 🚀 Tính năng chính
 
@@ -20,7 +20,6 @@
 - MongoDB
 - RESTful API
 - C#
-- DevExpress UI (Windows)
 - Custom Converters, MultiBinding
 
 ## 📦 Cài đặt và chạy thử
