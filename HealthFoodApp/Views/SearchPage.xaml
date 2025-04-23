@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             xmlns:models="clr-namespace:HealthFoodApp.Models"
+             x:Class="HealthFoodApp.Views.SearchPage"
+             Title="Tìm kiếm">
+
+    <ContentPage.BindingContext>
+        <viewmodels:SearchViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+        <!-- Search Header -->
+        <VerticalStackLayout Grid.Row="0" Spacing="16">
+            <Label Text="Tìm kiếm" FontSize="24" FontAttributes="Bold" Margin="0,0,0,8" />
+
+            <!-- Search Bar -->
+            <Frame Padding="0" BorderColor="{StaticResource Gray200}" HasShadow="False" CornerRadius="12">
+                <Grid ColumnDefinitions="Auto,*,Auto" Padding="12,0">
+                    <Image Grid.Column="0" Source="search.png" HeightRequest="20" WidthRequest="20" VerticalOptions="Center" />
+                    <Entry Grid.Column="1" 
+                           Placeholder="Tìm món ăn, nhà hàng..." 
+                           Text="{Binding SearchQuery}" 
+                           ReturnCommand="{Binding SearchCommand}"
+                           TextChanged="OnSearchTextChanged"
+                           ClearButtonVisibility="WhileEditing"
+                           Margin="8,0" />
+                    <Button Grid.Column="2" 
+                            Text="Lọc" 
+                            FontSize="14"
+                            Command="{Binding ShowFiltersCommand}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="{StaticResource TextPrimary}"
+                            CornerRadius="8"
+                            Padding="12,6"
+                            HeightRequest="36" />
+                </Grid>
+            </Frame>
+
+            <!-- Filter Tags (visible when filters are applied) -->
+            <FlexLayout IsVisible="{Binding HasActiveFilters}"
+                        Wrap="Wrap" 
+                        JustifyContent="Start" 
+                        AlignItems="Center" 
+                        BindableLayout.ItemsSource="{Binding ActiveFilters}">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,0,8,8" Padding="8,4" BackgroundColor="{StaticResource Primary}" BorderColor="{StaticResource Primary}" CornerRadius="12">
+                            <StackLayout Orientation="Horizontal" Spacing="4">
+                                <Label Text="{Binding Name}" TextColor="White" FontSize="12" VerticalOptions="Center" />
+                                <Button Text="✕" 
+                                        FontSize="12" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=RemoveFilterCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="Transparent" 
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        HeightRequest="24"
+                                        WidthRequest="24"
+                                        Padding="0" />
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+        </VerticalStackLayout>
+
+        <!-- Search Content -->
+        <ScrollView Grid.Row="1" Margin="0,16,0,0">
+            <VerticalStackLayout Spacing="20">
+                <!-- Recent Searches (visible when no search is active) -->
+                <VerticalStackLayout IsVisible="{Binding IsRecentSearchesVisible}" Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Tìm kiếm gần đây" FontSize="16" FontAttributes="Bold" />
+                        <Button Grid.Column="1" 
+                                Text="Xóa tất cả" 
+                                Command="{Binding ClearRecentSearchesCommand}"
+                                BackgroundColor="Transparent" 
+                                TextColor="{StaticResource Primary}"
+                                FontSize="14"
+                                Padding="0" />
+                    </Grid>
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding RecentSearches}" Spacing="8">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Padding="12" BorderColor="{StaticResource Gray200}" HasShadow="False" CornerRadius="8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="{Binding .}" VerticalOptions="Center" />
+                                        <Button Grid.Column="1" 
+                                                Text="🔍" 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=UseRecentSearchCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="Transparent" 
+                                                Padding="0" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- Popular Searches (visible when no search is active) -->
+                <VerticalStackLayout IsVisible="{Binding IsRecentSearchesVisible}" Spacing="12">
+                    <Label Text="Phổ biến" FontSize="16" FontAttributes="Bold" />
+                    <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center" 
+                                BindableLayout.ItemsSource="{Binding PopularSearches}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Margin="0,0,8,8" Padding="12,8" BackgroundColor="{StaticResource Secondary}" BorderColor="{StaticResource Gray200}" CornerRadius="20">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=UseRecentSearchCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                    <Label Text="{Binding .}" FontSize="14" />
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+
+                <!-- Search Results (visible when search is active) -->
+                <VerticalStackLayout IsVisible="{Binding IsSearchResultsVisible}" Spacing="16">
+                    <!-- Food Results -->
+                    <VerticalStackLayout IsVisible="{Binding HasFoodResults}" Spacing="12">
+                        <Label Text="Món ăn" FontSize="16" FontAttributes="Bold" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding FoodResults}" Spacing="12">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:FoodItem">
+                                    <Frame Style="{StaticResource CardFrame}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=FoodItemTappedCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Frame.GestureRecognizers>
+                                        <Grid ColumnDefinitions="Auto,*" Padding="8">
+                                            <Frame CornerRadius="8" HeightRequest="80" WidthRequest="80" Padding="0" IsClippedToBounds="True">
+                                                <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                            </Frame>
+                                            <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                                <Label Text="{Binding Title}" FontAttributes="Bold" />
+                                                <Label Text="{Binding Restaurant}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+                                                    <Label Text="{Binding Price}" FontAttributes="Bold" />
+                                                    <Frame Grid.Column="2" 
+                                                           IsVisible="{Binding HealthTag, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                           Padding="6,2" 
+                                                           BackgroundColor="{StaticResource Green50}" 
+                                                           BorderColor="{StaticResource Green100}" 
+                                                           CornerRadius="4">
+                                                        <Label Text="{Binding HealthTag}" FontSize="10" TextColor="{StaticResource Green800}" />
+                                                    </Frame>
+                                                </Grid>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Restaurant Results -->
+                    <VerticalStackLayout IsVisible="{Binding HasRestaurantResults}" Spacing="12">
+                        <Label Text="Nhà hàng" FontSize="16" FontAttributes="Bold" />
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding RestaurantResults}" Spacing="12">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:Restaurant">
+                                    <Frame Style="{StaticResource CardFrame}">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SearchViewModel}}, Path=RestaurantTappedCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Frame.GestureRecognizers>
+                                        <Grid ColumnDefinitions="Auto,*" Padding="8">
+                                            <Frame CornerRadius="8" HeightRequest="80" WidthRequest="80" Padding="0" IsClippedToBounds="True">
+                                                <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                            </Frame>
+                                            <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                                <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center" Margin="0,4,0,0">
+                                                    <Label Text="{Binding Tags[0]}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                                                    <Label Text=" • " FontSize="12" TextColor="{StaticResource Gray500}" />
+                                                    <Label Text="{Binding DeliveryTime}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                                                </FlexLayout>
+                                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+                                                    <Label Text="{Binding Rating, StringFormat='{0} ★'}" FontAttributes="Bold" TextColor="{StaticResource Green800}" />
+                                                    <Label Grid.Column="2" 
+                                                           Text="{Binding HealthMatch}" 
+                                                           IsVisible="{Binding HealthMatch, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                           FontSize="12" 
+                                                           TextColor="{StaticResource Green800}" />
+                                                </Grid>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- No Results Message -->
+                    <VerticalStackLayout IsVisible="{Binding NoResults}" HorizontalOptions="Center" VerticalOptions="Center" Spacing="16" Margin="0,40,0,0">
+                        <Image Source="search_empty.png" HeightRequest="120" WidthRequest="120" />
+                        <Label Text="Không tìm thấy kết quả" FontSize="18" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Text="Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc" 
+                               FontSize="14" 
+                               TextColor="{StaticResource Gray500}" 
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="1" 
+                           IsRunning="{Binding IsLoading}" 
+                           IsVisible="{Binding IsLoading}"
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center" 
+                           Color="{StaticResource Primary}" />
+    </Grid>
+</ContentPage>

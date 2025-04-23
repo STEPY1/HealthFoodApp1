@@ -1,0 +1,32 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             x:Class="HealthFoodApp.Views.StartOrderPage"
+             Shell.NavBarIsVisible="True"
+             Title="Start Order">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="12" Margin="6">
+            <!-- Tiêu đề  -->
+            <Image Source="{Binding Restaurant.Image}" Aspect="AspectFill" HeightRequest="120"/>
+                <Frame Style="{StaticResource CardFrame}" HorizontalOptions="Center">
+                    <!-- Danh sách món ăn -->
+                    <CollectionView ItemsSource="{Binding PopularItems}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BorderColor="LightGray" Padding="16" Margin="16">
+                                    <HorizontalStackLayout>
+                                        <Image Source="{Binding Image}" WidthRequest="80" HeightRequest="80" Aspect="AspectFill"/>
+                                        <VerticalStackLayout Padding="10,0">
+                                            <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                            <Label Text="{Binding Price, StringFormat='Price: {0:C}'}"/>
+                                        </VerticalStackLayout>
+                                    </HorizontalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

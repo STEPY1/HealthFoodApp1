@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:HealthFoodApp.Converters"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             xmlns:models="clr-namespace:HealthFoodApp.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="HealthFoodApp.Views.BrowsePage"
+             Title="Duyệt">
+
+    <ContentPage.BindingContext>
+        <viewmodels:BrowseViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="24">
+            <!-- Header -->
+            <Label Text="Khám phá" FontSize="24" FontAttributes="Bold" />
+
+            <!-- Categories -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Danh mục" FontSize="18" FontAttributes="Bold" />
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding Categories}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:Category">
+                                <Frame Style="{StaticResource CardFrame}" 
+                                       WidthRequest="100" 
+                                       HeightRequest="120"
+                                       Padding="0">
+                                    <Frame.BackgroundColor>
+                                        <MultiBinding Converter="{StaticResource CategoryToColorMultiConverter}">
+                                            <Binding Path="Title" />
+                                            <Binding Path="SelectedCategory" 
+                                                     Source="{RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}" />
+                                        </MultiBinding>
+                                    </Frame.BackgroundColor>
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}, Path=CategorySelectedCommand}"
+                                                              CommandParameter="{Binding Title}" />
+                                    </Frame.GestureRecognizers>
+                                    <Grid RowDefinitions="*,Auto" Padding="8">
+                                        <Frame Grid.Row="0" 
+                                               CornerRadius="50" 
+                                               HeightRequest="60" 
+                                               WidthRequest="60" 
+                                               Padding="0"
+                                               IsClippedToBounds="True"
+                                               HorizontalOptions="Center"
+                                               BackgroundColor="{StaticResource Secondary}">
+                                            <Image Source="{Binding Image}" 
+                                                   Aspect="AspectFill" 
+                                                   HeightRequest="60" 
+                                                   WidthRequest="60" />
+                                        </Frame>
+                                        <VerticalStackLayout Grid.Row="1" 
+                                                             HorizontalOptions="Center" 
+                                                             Spacing="2"
+                                                             Margin="0,8,0,0">
+                                            <Label Text="{Binding Title}">
+                                                <Label.TextColor>
+                                                    <MultiBinding Converter="{StaticResource CategoryToColorMultiConverter}">
+                                                        <Binding Path="Title" />
+                                                        <Binding Path="SelectedCategory"
+                                                                 Source="{RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}" />
+                                                    </MultiBinding>
+                                                </Label.TextColor>
+                                            </Label>
+                                            <Label Text="{Binding Count}" 
+                                                   FontSize="10" 
+                                                   HorizontalOptions="Center">
+                                                <Label.TextColor>
+                                                    <MultiBinding Converter="{StaticResource CategoryToColorMultiConverter}">
+                                                        <Binding Path="Title" />
+                                                        <Binding Path="SelectedCategory"
+                                                                 Source="{RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}" />
+                                                    </MultiBinding>
+                                                </Label.TextColor>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+            </VerticalStackLayout>
+
+            <!-- Featured Restaurants -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Nhà hàng nổi bật" FontSize="18" FontAttributes="Bold" />
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding FeaturedRestaurants}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:Restaurant">
+                                <Frame Style="{StaticResource CardFrame}" 
+                                       WidthRequest="280" 
+                                       HeightRequest="200"
+                                       Padding="0">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}, Path=RestaurantTappedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                    <Grid RowDefinitions="Auto,Auto">
+                                        <Frame Grid.Row="0" 
+                                               HeightRequest="140" 
+                                               Padding="0"
+                                               CornerRadius="0"
+                                               IsClippedToBounds="True">
+                                            <Image Source="{Binding Image}" 
+                                                   Aspect="AspectFill" 
+                                                   HeightRequest="140" />
+                                        </Frame>
+                                        <Frame Grid.Row="0" 
+                                               Style="{StaticResource BadgeFrame}" 
+                                               BackgroundColor="{StaticResource Green500}"
+                                               HorizontalOptions="End" 
+                                               VerticalOptions="Start" 
+                                               Margin="8">
+                                            <Label Text="{Binding Rating, StringFormat='{0} ★'}" 
+                                                   Style="{StaticResource BadgeLabel}" />
+                                        </Frame>
+                                        <VerticalStackLayout Grid.Row="1" Padding="12,8">
+                                            <Label Text="{Binding Name}" 
+                                                   FontAttributes="Bold" />
+                                            <FlexLayout Wrap="Wrap" 
+                                                        JustifyContent="Start" 
+                                                        AlignItems="Center" 
+                                                        BindableLayout.ItemsSource="{Binding Tags}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Label Text="{Binding .}" 
+                                                               FontSize="12" 
+                                                               TextColor="{StaticResource Gray500}" />
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                                <Label Text=" • " 
+                                                       FontSize="12" 
+                                                       TextColor="{StaticResource Gray500}" />
+                                                <Label Text="{Binding DeliveryTime}" 
+                                                       FontSize="12" 
+                                                       TextColor="{StaticResource Gray500}" />
+                                            </FlexLayout>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+            </VerticalStackLayout>
+
+            <!-- Cuisine Types -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Loại ẩm thực" FontSize="18" FontAttributes="Bold" />
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding CuisineTypes}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:CuisineType">
+                                <Frame Style="{StaticResource CardFrame}" 
+                                       WidthRequest="100" 
+                                       HeightRequest="120"
+                                       Padding="0">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}, Path=CuisineSelectedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                    <Grid RowDefinitions="*,Auto" Padding="8">
+                                        <Frame Grid.Row="0" 
+                                               CornerRadius="50" 
+                                               HeightRequest="60" 
+                                               WidthRequest="60" 
+                                               Padding="0"
+                                               IsClippedToBounds="True"
+                                               HorizontalOptions="Center"
+                                               BackgroundColor="{StaticResource Secondary}">
+                                            <Image Source="{Binding Image}" 
+                                                   Aspect="AspectFill" 
+                                                   HeightRequest="60" 
+                                                   WidthRequest="60" />
+                                        </Frame>
+                                        <Label Grid.Row="1" 
+                                               Text="{Binding Name}" 
+                                               FontAttributes="Bold" 
+                                               HorizontalOptions="Center"
+                                               Margin="0,8,0,0" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+            </VerticalStackLayout>
+
+            <!-- Special Offers -->
+            <VerticalStackLayout Spacing="12">
+                <Label Text="Ưu đãi đặc biệt" FontSize="18" FontAttributes="Bold" />
+
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding SpecialOffers}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:SpecialOffer">
+                                <Frame Style="{StaticResource CardFrame}" 
+                                       WidthRequest="280" 
+                                       HeightRequest="160"
+                                       Padding="0"
+                                       BackgroundColor="{Binding BackgroundColor}">
+                                    <Frame.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}, Path=OfferSelectedCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Frame.GestureRecognizers>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Grid.Column="0" Padding="16" Spacing="8">
+                                            <Label Text="{Binding Title}" 
+                                                   FontSize="18" 
+                                                   FontAttributes="Bold" 
+                                                   TextColor="White" />
+                                            <Label Text="{Binding Description}" 
+                                                   FontSize="14" 
+                                                   TextColor="White" />
+                                            <Frame Padding="8,4" 
+                                                   BackgroundColor="White" 
+                                                   BorderColor="White" 
+                                                   CornerRadius="4"
+                                                   HorizontalOptions="Start"
+                                                   Margin="0,8,0,0">
+                                                <Label Text="{Binding Code}" 
+                                                       FontAttributes="Bold" 
+                                                       TextColor="{Binding BackgroundColor}" />
+                                            </Frame>
+                                            <Label Text="{Binding ExpiryDate, StringFormat='Hết hạn: {0}'}" 
+                                                   FontSize="12" 
+                                                   TextColor="White"
+                                                   Opacity="0.8"
+                                                   Margin="0,4,0,0" />
+                                        </VerticalStackLayout>
+                                        <Image Grid.Column="1" 
+                                               Source="{Binding Image}" 
+                                               Aspect="AspectFill" 
+                                               WidthRequest="100"
+                                               Opacity="0.5" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+            </VerticalStackLayout>
+
+            <!-- Restaurants List -->
+            <VerticalStackLayout Spacing="12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Nhà hàng" FontSize="18" FontAttributes="Bold" />
+                    <Picker Grid.Column="1" 
+                            Title="Sắp xếp" 
+                            WidthRequest="120"
+                            FontSize="14"
+                            x:Name="SortPicker">
+                        <Picker.Items>
+                            <x:String>Đánh giá</x:String>
+                            <x:String>Thời gian giao</x:String>
+                            <x:String>Phí giao hàng</x:String>
+                        </Picker.Items>
+                        <Picker.Behaviors>
+                            <toolkit:EventToCommandBehavior
+                                EventName="SelectedIndexChanged"
+                                Command="{Binding SortCommand}"
+                                CommandParameter="{Binding Source={x:Reference SortPicker}, Path=SelectedItem}" />
+                        </Picker.Behaviors>
+                    </Picker>
+                </Grid>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding FilteredRestaurants}" Spacing="12">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:Restaurant">
+                            <Frame Style="{StaticResource CardFrame}" Padding="0">
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BrowseViewModel}}, Path=RestaurantTappedCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Frame.GestureRecognizers>
+                                <Grid RowDefinitions="Auto,Auto">
+                                    <Frame Grid.Row="0" 
+                                           HeightRequest="160" 
+                                           Padding="0"
+                                           CornerRadius="0"
+                                           IsClippedToBounds="True">
+                                        <Image Source="{Binding Image}" 
+                                               Aspect="AspectFill" 
+                                               HeightRequest="160" />
+                                    </Frame>
+                                    <Frame Grid.Row="0" 
+                                           Style="{StaticResource BadgeFrame}" 
+                                           BackgroundColor="{StaticResource Green500}"
+                                           HorizontalOptions="End" 
+                                           VerticalOptions="Start" 
+                                           Margin="8">
+                                        <Label Text="{Binding Rating, StringFormat='{0} ★'}" 
+                                               Style="{StaticResource BadgeLabel}" />
+                                    </Frame>
+                                    <Frame Grid.Row="0" 
+                                           IsVisible="{Binding Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                           Style="{StaticResource BadgeFrame}" 
+                                           BackgroundColor="{StaticResource Blue500}"
+                                           HorizontalOptions="Start" 
+                                           VerticalOptions="Start" 
+                                           Margin="8">
+                                        <Label Text="{Binding Discount}" 
+                                               Style="{StaticResource BadgeLabel}" />
+                                    </Frame>
+                                    <VerticalStackLayout Grid.Row="1" Padding="16,12">
+                                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                            <Label Text="{Binding Name}" 
+                                                   FontSize="18" 
+                                                   FontAttributes="Bold" />
+                                            <Frame Grid.Column="1" 
+                                                   Padding="8,4" 
+                                                   BackgroundColor="{StaticResource Green50}" 
+                                                   BorderColor="{StaticResource Green100}" 
+                                                   CornerRadius="12">
+                                                <Label Text="{Binding DeliveryTime}" 
+                                                       FontSize="12" 
+                                                       TextColor="{StaticResource Green800}" />
+                                            </Frame>
+                                        </Grid>
+
+                                        <FlexLayout Wrap="Wrap" 
+                                                    JustifyContent="Start" 
+                                                    AlignItems="Center" 
+                                                    Margin="0,0,0,8"
+                                                    BindableLayout.ItemsSource="{Binding Tags}">
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Frame Margin="0,0,4,4" 
+                                                           Padding="8,4" 
+                                                           BackgroundColor="{StaticResource Secondary}" 
+                                                           BorderColor="{StaticResource Gray200}" 
+                                                           CornerRadius="12">
+                                                        <Label Text="{Binding .}" 
+                                                               FontSize="12" 
+                                                               TextColor="{StaticResource Gray600}" />
+                                                    </Frame>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </FlexLayout>
+
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackLayout Orientation="Horizontal" Spacing="4">
+                                                <Label Text="{Binding DeliveryFee, StringFormat='{0} giao hàng'}" 
+                                                       FontSize="14" 
+                                                       TextColor="{StaticResource Gray500}" />
+                                                <Label Text="{Binding OriginalDeliveryFee}" 
+                                                       IsVisible="{Binding OriginalDeliveryFee, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                       TextDecorations="Strikethrough" 
+                                                       TextColor="{StaticResource Gray500}" 
+                                                       FontSize="12" />
+                                            </StackLayout>
+                                            <Label Grid.Column="1" 
+                                                   Text="{Binding HealthMatch}" 
+                                                   FontSize="12" 
+                                                   TextColor="{StaticResource Green800}" 
+                                                   FontAttributes="Bold" />
+                                        </Grid>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

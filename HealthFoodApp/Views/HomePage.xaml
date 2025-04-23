@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:HealthFoodApp.Converters"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             xmlns:models="clr-namespace:HealthFoodApp.Models"
+             x:Class="HealthFoodApp.Views.HomePage"
+             x:Name="HomePageView"
+             Title="Home">
+    <ContentPage.Resources>
+        <converters:StringEqualConverter x:Key="StringEqualConverter" />
+        <converters:StringToColorConverter x:Key="StringToColorConverter" />
+        <converters:StringToTextColorConverter x:Key="StringToTextColorConverter" />
+        <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+        <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <viewmodels:HomeViewModel />
+    </ContentPage.BindingContext>
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+        <AbsoluteLayout x:Name="MainLayout">
+
+            
+            <!-- Nội dung chính -->
+            <ScrollView AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All">
+                
+                <VerticalStackLayout Spacing="16" Padding="16" Margin="0">
+                    <!-- Header -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" 
+                          RowDefinitions="Auto,Auto" 
+                          BackgroundColor="Transparent"
+                          Margin="0,0,0,8">
+                        <Frame Grid.Row="0" Grid.Column="0" 
+                               CornerRadius="50" 
+                               HeightRequest="50" 
+                               WidthRequest="50" 
+                               Padding="0" 
+                               IsClippedToBounds="True">
+                            <ImageButton Source="https://images.unsplash.com/photo-1546069901-ba9599a7e63c" 
+                                         Aspect="AspectFill"/>
+                        </Frame>
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" Margin="8,0,0,0">
+                            <HorizontalStackLayout>
+                                <Label Text="Deliver to Hồ Chí Minh" FontSize="14" />
+                                <Image Source="chevron_down.png" HeightRequest="16" WidthRequest="16" Margin="4,0,0,0" />
+                            </HorizontalStackLayout>
+                            <Label Text="123 Main St, San Francisco" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        </VerticalStackLayout>
+                        <Grid Grid.Column="2" HeightRequest="40" WidthRequest="40">
+                            <Button 
+                            Text="🛒" 
+                            FontSize="18" 
+                            CornerRadius="20"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            Padding="0"
+                            BackgroundColor="{StaticResource Secondary}" 
+                            TextColor="{StaticResource TextPrimary}">
+                                <Button.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ShowCartCommand}" />
+                                </Button.GestureRecognizers>
+                            </Button>
+                            <Frame IsVisible="{Binding HasCartItems}"
+                               BackgroundColor="{StaticResource Primary}"
+                               CornerRadius="10"
+                               HeightRequest="20"
+                               WidthRequest="20"
+                               Padding="0"
+                               HorizontalOptions="End"
+                               VerticalOptions="Start"
+                               Margin="-5,-5,0,0">
+                                <Label Text="{Binding CartItemCount}" 
+                                   TextColor="White" 
+                                   FontSize="10" 
+                                   HorizontalOptions="Center" 
+                                   VerticalOptions="Center" />
+                            </Frame>
+                        </Grid>
+                    </Grid>
+                    <!-- Categories -->
+                    <VerticalStackLayout  Margin="0,0,0,8">
+                        <!-- Categories Grid -->
+                        <CollectionView ItemsSource="{Binding Categories}"
+                                        HeightRequest="230"
+                                        Margin="0,8,0,0">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="4" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:Category">
+                                    <Frame Style="{StaticResource CardFrame1}" Margin="6" Padding="12" HorizontalOptions="Center">
+                                        <VerticalStackLayout HorizontalOptions="Center" Spacing="2">
+                                            <Frame CornerRadius="50"
+                                                   HeightRequest="55"
+                                                   WidthRequest="55"
+                                                   Padding="0"
+                                                   IsClippedToBounds="True"
+                                                   HorizontalOptions="Center">
+                                                <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                            </Frame>
+                                            <Label Text="{Binding Title}" 
+                                                   FontAttributes="Bold" 
+                                                   HorizontalTextAlignment="Center" />
+                                        </VerticalStackLayout>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                    <!-- Recommended for You -->
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,auto">
+                            <Label Text="Recommended for You" Style="{StaticResource SectionTitle}" />
+                            <Label Grid.Column="1" Text="See all" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        </Grid>
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding HealthFoodItems}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FoodItem">
+                                        <Frame Style="{StaticResource CardFrame}" WidthRequest="160" HeightRequest="220">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference HomePageView}, 
+                                                                  Path=BindingContext.FoodItemTappedCommand}" 
+                                                                  CommandParameter="{Binding .}" />
+                                            </Frame.GestureRecognizers>
+                                            <VerticalStackLayout Spacing="0">
+                                                <Grid HeightRequest="120">
+                                                    <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                                    <Frame IsVisible="{Binding HealthTag, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                       Style="{StaticResource BadgeFrame}" 
+                                                       BackgroundColor="{StaticResource Green500}"
+                                                       HorizontalOptions="Start" 
+                                                       VerticalOptions="Start" 
+                                                       Margin="4">
+                                                        <Label Text="{Binding HealthTag}" Style="{StaticResource BadgeLabel}" />
+                                                    </Frame>
+                                                    <Frame IsVisible="{Binding Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                       Style="{StaticResource BadgeFrame}" 
+                                                       BackgroundColor="{StaticResource Blue500}"
+                                                       HorizontalOptions="End" 
+                                                       VerticalOptions="End" 
+                                                       Margin="4">
+                                                        <Label Text="{Binding Discount}" Style="{StaticResource BadgeLabel}" />
+                                                    </Frame>
+                                                </Grid>
+                                                <VerticalStackLayout Padding="12,8">
+                                                    <Label Text="{Binding Title}" Style="{StaticResource CardTitle}" />
+                                                    <Label Text="{Binding Restaurant}" Style="{StaticResource CardSubtitle}" />
+                                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,8,0,0">
+                                                        <StackLayout Orientation="Horizontal" Spacing="4">
+                                                            <Label Text="{Binding Price}" FontAttributes="Bold" />
+                                                            <Label Text="{Binding OriginalPrice}" 
+                                                               IsVisible="{Binding Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                               TextDecorations="Strikethrough" 
+                                                               TextColor="{StaticResource Gray500}" 
+                                                               FontSize="12" />
+                                                        </StackLayout>
+                                                        <BoxView Grid.Column="2" 
+                                                             WidthRequest="8" 
+                                                             HeightRequest="8" 
+                                                             CornerRadius="4"
+                                                             Color="{StaticResource Green500}"
+                                                             IsVisible="{Binding HealthReason, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+                                                    </Grid>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                    <!-- Popular Near You -->
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Popular Near You" Style="{StaticResource SectionTitle}" />
+                            <Label Grid.Column="1" Text="See all" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        </Grid>
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding RegularFoodItems}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FoodItem">
+                                        <Frame Style="{StaticResource CardFrame}" WidthRequest="160" HeightRequest="200">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference HomePageView}, 
+                                                                  Path=BindingContext.FoodItemTappedCommand}" 
+                                                                  CommandParameter="{Binding .}" />
+                                            </Frame.GestureRecognizers>
+                                            <VerticalStackLayout Spacing="0">
+                                                <Image Source="{Binding Image}" Aspect="AspectFill" HeightRequest="120" />
+                                                <VerticalStackLayout Padding="12,8">
+                                                    <Label Text="{Binding Title}" Style="{StaticResource CardTitle}" />
+                                                    <Label Text="{Binding Restaurant}" Style="{StaticResource CardSubtitle}" />
+                                                    <Label Text="{Binding Price}" FontAttributes="Bold" Margin="0,8,0,0" />
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                    </VerticalStackLayout>
+                    <!-- Restaurants -->
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Restaurants Near You" Style="{StaticResource SectionTitle}" />
+                            <Label Grid.Column="1" Text="See all" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                        </Grid>
+                        <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                            <HorizontalStackLayout Spacing="12" BindableLayout.ItemsSource="{Binding RestaurantLimits}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:Restaurant">
+                                        <Frame Style="{StaticResource CardFrame}">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={x:Reference HomePageView}, 
+                                                              Path=BindingContext.RestaurantTappedCommand}" 
+                                                              CommandParameter="{Binding .}" />
+                                            </Frame.GestureRecognizers>
+                                            <HorizontalStackLayout Spacing="0">
+                                                <Grid HeightRequest="160">
+                                                    <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                                    <Frame Style="{StaticResource BadgeFrame}" 
+                                                   BackgroundColor="{StaticResource Green500}"
+                                                   HorizontalOptions="End" 
+                                                   VerticalOptions="Start" 
+                                                   Margin="8">
+                                                        <Label Text="{Binding Rating, StringFormat='{0} ★'}" Style="{StaticResource BadgeLabel}" />
+                                                    </Frame>
+                                                    <Frame IsVisible="{Binding Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                   Style="{StaticResource BadgeFrame}" 
+                                                   BackgroundColor="{StaticResource Blue500}"
+                                                   HorizontalOptions="Start" 
+                                                   VerticalOptions="Start" 
+                                                   Margin="8">
+                                                        <Label Text="{Binding Discount}" Style="{StaticResource BadgeLabel}" />
+                                                    </Frame>
+                                                </Grid>
+                                                <VerticalStackLayout Padding="16,12">
+                                                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                                        <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                                                        <Frame Grid.Column="1" Padding="8,4" BackgroundColor="{StaticResource Green50}" BorderColor="{StaticResource Green100}" CornerRadius="12">
+                                                            <Label Text="{Binding DeliveryTime}" FontSize="12" TextColor="{StaticResource Green800}" />
+                                                        </Frame>
+                                                    </Grid>
+
+                                                    <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center" Margin="0,0,0,8"
+                                                        BindableLayout.ItemsSource="{Binding Tags}">
+                                                        <BindableLayout.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Frame Margin="0,0,4,4" Padding="8,4" BackgroundColor="{StaticResource Secondary}" BorderColor="{StaticResource Gray200}" CornerRadius="12">
+                                                                    <Label Text="{Binding .}" FontSize="12" TextColor="{StaticResource Gray600}" />
+                                                                </Frame>
+                                                            </DataTemplate>
+                                                        </BindableLayout.ItemTemplate>
+                                                    </FlexLayout>
+
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <StackLayout Orientation="Horizontal" Spacing="4">
+                                                            <Label Text="{Binding DeliveryFee, StringFormat='{0} delivery'}" FontSize="14" TextColor="{StaticResource Gray500}" />
+                                                            <Label Text="{Binding OriginalDeliveryFee}" 
+                                                           IsVisible="{Binding OriginalDeliveryFee, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                           TextDecorations="Strikethrough" 
+                                                           TextColor="{StaticResource Gray500}" 
+                                                           FontSize="12" />
+                                                        </StackLayout>
+                                                        <Label Grid.Column="1" 
+                                                       Text="{Binding HealthMatch}" 
+                                                       FontSize="12" 
+                                                       TextColor="{StaticResource Green800}" 
+                                                       FontAttributes="Bold" />
+                                                    </Grid>
+
+                                                    <Label Text="{Binding DiscountDisplay}"
+                                                   IsVisible="{Binding Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                                                   FontSize="12" 
+                                                   TextColor="{StaticResource Blue800}" 
+                                                   Margin="0,8,0,0" />
+                                                </VerticalStackLayout>
+                                            </HorizontalStackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </HorizontalStackLayout>
+                        </ScrollView>
+                        <Label Text="Không còn thông tin để hiển thị"
+                           Padding="0,10"
+                           FontAttributes="None"
+                           HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Shopping Cart Popup -->
+            <Frame x:Name="CartPopup"
+               IsVisible="{Binding IsCartVisible}"
+               BackgroundColor="#80000000"
+               Padding="0"
+               HasShadow="False"
+               CornerRadius="0"
+               HorizontalOptions="FillAndExpand"
+               VerticalOptions="FillAndExpand"
+               AbsoluteLayout.LayoutBounds="0,0,1,1"
+               AbsoluteLayout.LayoutFlags="All">
+                <Frame Margin="20"
+                   CornerRadius="12"
+                   BackgroundColor="White"
+                   VerticalOptions="Center"
+                   MaximumHeightRequest="500">
+                    <Grid RowDefinitions="Auto,*,Auto" >
+                        <!-- Header -->
+                        <StackLayout Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                            <Label Text="Your Cart" FontSize="18" FontAttributes="Bold" HorizontalOptions="StartAndExpand" />
+                            <Label Text="{Binding CartItemsDescription}" FontSize="12" TextColor="{StaticResource Gray500}" VerticalOptions="Center" />
+                            <Button Text="✕" 
+                                FontSize="16" 
+                                BackgroundColor="Transparent" 
+                                TextColor="{StaticResource TextPrimary}"
+                                WidthRequest="30"
+                                HeightRequest="30"
+                                Padding="0"
+                                Command="{Binding HideCartCommand}" />
+                        </StackLayout>
+                        <!-- Cart Items or Empty State -->
+                        <ScrollView Grid.Row="1">
+                            <Grid>
+                                <StackLayout Spacing="10" IsVisible="{Binding HasCartItems}">
+                                    <BindableLayout.ItemsSource>
+                                        <Binding Path="CartItems" />
+                                    </BindableLayout.ItemsSource>
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Frame Style="{StaticResource CardFrame}" Padding="10" Margin="0,0,0,8">
+                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                    <!-- Item Image -->
+                                                    <Frame Grid.Column="0" 
+                                                       CornerRadius="8" 
+                                                       HeightRequest="60" 
+                                                       WidthRequest="60" 
+                                                       Padding="0"
+                                                       IsClippedToBounds="True">
+                                                        <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                                    </Frame>
+
+                                                    <!-- Item Details -->
+                                                    <StackLayout Grid.Column="1" Margin="10,0" VerticalOptions="Center">
+                                                        <Label Text="{Binding Title}" FontAttributes="Bold" />
+                                                        <Label Text="{Binding Restaurant}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                                                        <Label Text="{Binding Price}" FontAttributes="Bold" />
+                                                    </StackLayout>
+
+                                                    <!-- Quantity Controls -->
+                                                    <StackLayout Grid.Column="2" Orientation="Horizontal" Spacing="5" VerticalOptions="Center">
+                                                        <Button Text="-" 
+                                                            FontSize="16" 
+                                                            CornerRadius="15"
+                                                            HeightRequest="30"
+                                                            WidthRequest="30"
+                                                            Padding="0"
+                                                            BackgroundColor="{StaticResource Secondary}"
+                                                            TextColor="{StaticResource TextPrimary}"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HomeViewModel}}, Path=DecreaseQuantityCommand}"
+                                                            CommandParameter="{Binding .}" />
+
+                                                        <Label Text="{Binding Quantity}" 
+                                                           VerticalOptions="Center" 
+                                                           HorizontalOptions="Center"
+                                                           WidthRequest="30"
+                                                           HorizontalTextAlignment="Center" />
+
+                                                        <Button Text="+" 
+                                                            FontSize="16" 
+                                                            CornerRadius="15"
+                                                            HeightRequest="30"
+                                                            WidthRequest="30"
+                                                            Padding="0"
+                                                            BackgroundColor="{StaticResource Secondary}"
+                                                            TextColor="{StaticResource TextPrimary}"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HomeViewModel}}, Path=IncreaseQuantityCommand}"
+                                                            CommandParameter="{Binding .}" />
+
+                                                        <Button Text="🗑️" 
+                                                            FontSize="14" 
+                                                            CornerRadius="15"
+                                                            HeightRequest="30"
+                                                            WidthRequest="30"
+                                                            Padding="0"
+                                                            Margin="5,0,0,0"
+                                                            BackgroundColor="#FFEBEE"
+                                                            TextColor="#D32F2F"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HomeViewModel}}, Path=RemoveFromCartCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                                    </StackLayout>
+                                                </Grid>
+                                            </Frame>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </StackLayout>
+
+                                <!-- Empty Cart State -->
+                                <StackLayout IsVisible="{Binding HasCartItems, Converter={StaticResource InverseBoolConverter}}" 
+                                         VerticalOptions="Center" 
+                                         HorizontalOptions="Center"
+                                         Spacing="15"
+                                         Padding="20">
+                                    <Frame BackgroundColor="{StaticResource Secondary}" 
+                                       CornerRadius="40" 
+                                       HeightRequest="80" 
+                                       WidthRequest="80" 
+                                       HorizontalOptions="Center">
+                                        <Label Text="🛒" 
+                                           FontSize="36" 
+                                           HorizontalOptions="Center" 
+                                           VerticalOptions="Center" />
+                                    </Frame>
+                                    <Label Text="Your cart is empty" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       HorizontalOptions="Center" />
+                                    <Label Text="Looks like you haven't added any items to your cart yet." 
+                                       FontSize="14" 
+                                       TextColor="{StaticResource Gray500}" 
+                                       HorizontalOptions="Center"
+                                       HorizontalTextAlignment="Center" />
+                                </StackLayout>
+                            </Grid>
+                        </ScrollView>
+
+                        <!-- Footer with Totals and Buttons -->
+                        <StackLayout Grid.Row="2" Spacing="10" Margin="0,10,0,0" IsVisible="{Binding HasCartItems}">
+                            <!-- Order Summary -->
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource Gray200}" />
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+                                <Label Grid.Row="0" Grid.Column="0" Text="Subtotal" FontSize="14" TextColor="{StaticResource Gray500}" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Subtotal}" FontSize="14" FontAttributes="Bold" />
+
+                                <Label Grid.Row="1" Grid.Column="0" Text="Delivery Fee" FontSize="14" TextColor="{StaticResource Gray500}" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding DeliveryFee}" FontSize="14" FontAttributes="Bold" />
+
+                                <Label Grid.Row="2" Grid.Column="0" Text="Tax" FontSize="14" TextColor="{StaticResource Gray500}" />
+                                <Label Grid.Row="2" Grid.Column="1" Text="{Binding Tax}" FontSize="14" FontAttributes="Bold" />
+
+                                <Label Grid.Row="3" Grid.Column="0" Text="Total" FontSize="16" FontAttributes="Bold" Margin="0,10,0,0" />
+                                <Label Grid.Row="3" Grid.Column="1" Text="{Binding Total}" FontSize="16" FontAttributes="Bold" Margin="0,10,0,0" />
+                            </Grid>
+
+                            <!-- Action Buttons -->
+                            <Button Text="Proceed to Checkout" 
+                                BackgroundColor="{StaticResource Primary}" 
+                                TextColor="White"
+                                Command="{Binding CheckoutCommand}" />
+
+                            <Button Text="Continue Shopping" 
+                                BackgroundColor="{StaticResource Secondary}" 
+                                TextColor="{StaticResource TextPrimary}"
+                                Command="{Binding HideCartCommand}" />
+                        </StackLayout>
+                    </Grid>
+                </Frame>
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding HideCartCommand}" />
+                </Frame.GestureRecognizers>
+            </Frame>
+            <!-- Nút nổi -->
+            <Frame BackgroundColor="Transparent" 
+                   BorderColor="#E1E1E1"
+                   AbsoluteLayout.LayoutBounds="0.9,0.9,56,56"
+                   AbsoluteLayout.LayoutFlags="PositionProportional">
+                <ImageButton x:Name="FloatingButton"
+                    Source="dotnet_bot.png"
+                    BackgroundColor="Transparent"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30">
+                    <ImageButton.GestureRecognizers>
+                        <PanGestureRecognizer PanUpdated="FloatingButton_PanUpdated" />
+                    </ImageButton.GestureRecognizers>
+                </ImageButton>
+            </Frame>
+        </AbsoluteLayout>
+    </RefreshView>
+</ContentPage>

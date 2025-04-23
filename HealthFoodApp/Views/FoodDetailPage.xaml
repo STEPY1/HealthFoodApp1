@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             x:Class="HealthFoodApp.Views.FoodDetailPage"
+             Shell.NavBarIsVisible="False"
+             Title="Food Details">
+
+    <ContentPage.BindingContext>
+        <viewmodels:FoodDetailViewModel />
+    </ContentPage.BindingContext>
+    <AbsoluteLayout x:Name="RootLayout">
+        <ScrollView AbsoluteLayout.LayoutBounds="0,0,1,1"
+        AbsoluteLayout.LayoutFlags="All">
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- Food Image -->
+            <Frame Style="{StaticResource CardFrame}" Padding="0" HeightRequest="250">
+                <Grid>
+                    <Image Source="{Binding FoodItem.Image}" Aspect="AspectFill" />
+                    <Frame IsVisible="{Binding FoodItem.HealthTag, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                           Style="{StaticResource BadgeFrame}" 
+                           BackgroundColor="{StaticResource Green500}"
+                           HorizontalOptions="Start" 
+                           VerticalOptions="Start" 
+                           Margin="8">
+                        <Label Text="{Binding FoodItem.HealthTag}" Style="{StaticResource BadgeLabel}" />
+                    </Frame>
+                    <Frame IsVisible="{Binding FoodItem.Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                           Style="{StaticResource BadgeFrame}" 
+                           BackgroundColor="{StaticResource Blue500}"
+                           HorizontalOptions="End" 
+                           VerticalOptions="Start" 
+                           Margin="8">
+                        <Label Text="{Binding FoodItem.Discount}" Style="{StaticResource BadgeLabel}" />
+                    </Frame>
+                </Grid>
+            </Frame>
+
+            <!-- Food Details -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding FoodItem.Title}" FontSize="24" FontAttributes="Bold" />
+                <Label Text="{Binding FoodItem.Restaurant}" FontSize="16" TextColor="{StaticResource Gray500}" />
+                <Label Text="{Binding FoodItem.Price}" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0" />
+            </VerticalStackLayout>
+
+            <!-- Health Reason -->
+            <Frame IsVisible="{Binding FoodItem.HealthReason, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                   Style="{StaticResource CardFrame}" 
+                   BackgroundColor="{StaticResource Green50}" 
+                   BorderColor="{StaticResource Green100}">
+                <VerticalStackLayout Padding="12">
+                    <Label Text="Why This is Perfect for You" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Green800}" />
+                    <Label Text="{Binding FoodItem.HealthReason}" TextColor="{StaticResource Green800}" Margin="0,8,0,0" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Discount Reason -->
+            <Frame IsVisible="{Binding FoodItem.Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                   Style="{StaticResource CardFrame}" 
+                   BackgroundColor="{StaticResource Blue50}" 
+                   BorderColor="{StaticResource Blue100}">
+                <VerticalStackLayout Padding="12">
+                    <Label Text="Your Health Discount" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Blue800}" />
+                    <Label TextColor="{StaticResource Blue800}" Margin="0,8,0,0">
+                        <Label.Text>
+                            <MultiBinding StringFormat="You've earned {0} because of your achievement: {1}">
+                                <Binding Path="FoodItem.Discount" />
+                                <Binding Path="FoodItem.DiscountReason" />
+                            </MultiBinding>
+                        </Label.Text>
+                    </Label>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Description -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Description" FontSize="16" FontAttributes="Bold" />
+                <Label Text="{Binding FoodItem.Description}" TextColor="{StaticResource Gray600}" />
+            </VerticalStackLayout>
+
+            <!-- Nutrition -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Nutrition" FontSize="16" FontAttributes="Bold" />
+                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                    <Frame Grid.Column="0" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource Secondary}">
+                        <VerticalStackLayout Padding="8" HorizontalOptions="Center">
+                            <Label Text="Calories" FontSize="12" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" />
+                            <Label Text="{Binding FoodItem.Nutrition.Calories}" FontAttributes="Bold" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Column="1" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource Secondary}">
+                        <VerticalStackLayout Padding="8" HorizontalOptions="Center">
+                            <Label Text="Protein" FontSize="12" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" />
+                            <Label Text="{Binding FoodItem.Nutrition.Protein}" FontAttributes="Bold" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Column="2" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource Secondary}">
+                        <VerticalStackLayout Padding="8" HorizontalOptions="Center">
+                            <Label Text="Carbs" FontSize="12" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" />
+                            <Label Text="{Binding FoodItem.Nutrition.Carbs}" FontAttributes="Bold" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Column="3" Style="{StaticResource CardFrame}" BackgroundColor="{StaticResource Secondary}">
+                        <VerticalStackLayout Padding="8" HorizontalOptions="Center">
+                            <Label Text="Fat" FontSize="12" TextColor="{StaticResource Gray500}" HorizontalOptions="Center" />
+                            <Label Text="{Binding FoodItem.Nutrition.Fat}" FontAttributes="Bold" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Ingredients -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Ingredients" FontSize="16" FontAttributes="Bold" />
+                <FlexLayout Wrap="Wrap" JustifyContent="Start" AlignItems="Center" 
+                            BindableLayout.ItemsSource="{Binding FoodItem.Ingredients}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Margin="0,0,8,8" Padding="8,4" BackgroundColor="{StaticResource Secondary}" BorderColor="{StaticResource Gray200}" CornerRadius="12">
+                                <Label Text="{Binding .}" FontSize="12" TextColor="{StaticResource Gray600}" />
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </FlexLayout>
+            </VerticalStackLayout>
+
+            <!-- Add to Order Button -->
+            <Button Text="Add to Order" Margin="0,16,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
+        <Frame
+        AbsoluteLayout.LayoutBounds="16,16,40,40"
+        AbsoluteLayout.LayoutFlags="None"
+        Padding="0"
+        CornerRadius="20"
+        HasShadow="True"
+        BackgroundColor="Transparent">
+            <ImageButton
+            Source="iconback.jpg"
+            BackgroundColor="Transparent"
+            Clicked="OnBackButtonClicked" />
+        </Frame>
+    </AbsoluteLayout>
+</ContentPage>

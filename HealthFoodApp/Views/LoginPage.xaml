@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="HealthFoodApp.Views.LoginPage"
+             Shell.NavBarIsVisible="False"
+             Title="Đăng nhập">
+
+    <ContentPage.BindingContext>
+        <viewmodels:LoginViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20">
+        <!-- Header with back button -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,20,0,0">
+            <Button Grid.Column="0" 
+                    Text="←" 
+                    FontSize="24" 
+                    Command="{Binding BackCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource TextPrimary}"
+                    Padding="0"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    HorizontalOptions="Start" />
+            <Label Grid.Column="1" 
+                   Text="Đăng nhập" 
+                   FontSize="24" 
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Login Form -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="20" 
+                                 VerticalOptions="Center"
+                                 Margin="0,20,0,0">
+                <!-- App Logo -->
+                <Image Source="app_logo.png" 
+                       HeightRequest="100" 
+                       WidthRequest="100"
+                       HorizontalOptions="Center"
+                       Margin="0,0,0,20" />
+
+                <!-- Error Message -->
+                <Frame IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                       BackgroundColor="#FFEBEE"
+                       BorderColor="#FFCDD2"
+                       Padding="15,10"
+                       CornerRadius="8"
+                       HasShadow="False">
+                    <Label Text="{Binding ErrorMessage}" 
+                           TextColor="#D32F2F"
+                           HorizontalOptions="Center" />
+                </Frame>
+
+                <!-- Email Field -->
+                <Frame Padding="15,5" 
+                       BorderColor="{StaticResource Gray200}" 
+                       CornerRadius="10"
+                       HasShadow="False">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Image Source="email.png" 
+                               HeightRequest="24" 
+                               WidthRequest="24"
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               Placeholder="Email"
+                               Text="{Binding Email}"
+                               Keyboard="Email"
+                               ReturnType="Next"
+                               ClearButtonVisibility="WhileEditing"
+                               Margin="10,0,0,0" />
+                    </Grid>
+                </Frame>
+
+                <!-- Password Field -->
+                <Frame Padding="15,5" 
+                       BorderColor="{StaticResource Gray200}" 
+                       CornerRadius="10"
+                       HasShadow="False">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Image Source="lock.png" 
+                               HeightRequest="24" 
+                               WidthRequest="24"
+                               VerticalOptions="Center" />
+                        <Entry Grid.Column="1" 
+                               Placeholder="Mật khẩu"
+                               Text="{Binding Password}"
+                               IsPassword="{Binding IsPasswordVisible, Converter={StaticResource InverseBoolConverter}}"
+                               ReturnType="Done"
+                               ReturnCommand="{Binding LoginCommand}"
+                               Margin="10,0,0,0" />
+                        <Button Grid.Column="2"
+                                Text="{Binding IsPasswordVisible, Converter={StaticResource BoolToPasswordIconConverter}, ConverterParameter='👁️;👁️‍🗨️'}"
+                                Command="{Binding TogglePasswordVisibilityCommand}"
+                                BackgroundColor="Transparent"
+                                Padding="5,0"
+                                WidthRequest="40"
+                                HeightRequest="40" />
+                    </Grid>
+                </Frame>
+
+                <!-- Remember Me & Forgot Password -->
+                <Grid ColumnDefinitions="*,*">
+                    <HorizontalStackLayout Grid.Column="0" Spacing="8">
+                        <CheckBox IsChecked="{Binding RememberMe}" 
+                                  Color="{StaticResource Primary}" />
+                        <Label Text="Ghi nhớ đăng nhập" 
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="1" 
+                            Text="Quên mật khẩu?" 
+                            Command="{Binding ForgotPasswordCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            HorizontalOptions="End"
+                            Padding="0" />
+                </Grid>
+
+                <!-- Login Button -->
+                <Button Text="Đăng nhập" 
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                        Margin="0,20,0,0" />
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                   IsVisible="{Binding IsLoading}"
+                                   HorizontalOptions="Center" 
+                                   Color="{StaticResource Primary}" />
+
+                <!-- Register Option -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="5" Margin="0,20,0,0">
+                    <Label Text="Chưa có tài khoản?" 
+                           VerticalOptions="Center" />
+                    <Button Text="Đăng ký" 
+                            Command="{Binding RegisterCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            Padding="0"
+                            VerticalOptions="Center" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Social Login Options -->
+        <VerticalStackLayout Grid.Row="2" Spacing="15" Margin="0,0,0,20">
+            <Label Text="Hoặc đăng nhập với" 
+                   HorizontalOptions="Center" 
+                   TextColor="{StaticResource Gray500}" />
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="20">
+                <Button Text="G" 
+                        BackgroundColor="#DB4437" 
+                        TextColor="White"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        CornerRadius="25" />
+                <Button Text="f" 
+                        BackgroundColor="#4267B2" 
+                        TextColor="White"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        CornerRadius="25" />
+                <Button Text="in" 
+                        BackgroundColor="#0077B5" 
+                        TextColor="White"
+                        WidthRequest="50"
+                        HeightRequest="50"
+                        CornerRadius="25" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

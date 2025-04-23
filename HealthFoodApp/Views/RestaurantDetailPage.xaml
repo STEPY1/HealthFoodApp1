@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:HealthFoodApp.ViewModels"
+             x:Class="HealthFoodApp.Views.RestaurantDetailPage"
+             x:Name="RestaurantDetailViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="Restaurant Details">
+
+    <ContentPage.BindingContext>
+        <viewmodels:RestaurantDetailViewModel/>
+    </ContentPage.BindingContext>
+
+    <AbsoluteLayout x:Name="RootLayout">
+        <ScrollView AbsoluteLayout.LayoutBounds="0,0,1,1"
+        AbsoluteLayout.LayoutFlags="All">
+        <VerticalStackLayout Spacing="16" Padding="16">
+            <!-- Restaurant Image -->
+            <Frame Style="{StaticResource CardFrame}" Padding="0" HeightRequest="200">
+                <Grid>
+                    <Image Source="{Binding Restaurant.Image}" Aspect="AspectFill" />
+                    <Frame Style="{StaticResource BadgeFrame}" 
+                           BackgroundColor="{StaticResource Green500}"
+                           HorizontalOptions="End" 
+                           VerticalOptions="Start" 
+                           Margin="8">
+                        <Label Text="{Binding Restaurant.Rating, StringFormat='{0} ★'}" Style="{StaticResource BadgeLabel}" />
+                    </Frame>
+                    <Frame IsVisible="{Binding Restaurant.Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                           Style="{StaticResource BadgeFrame}" 
+                           BackgroundColor="{StaticResource Blue500}"
+                           HorizontalOptions="Start" 
+                           VerticalOptions="Start" 
+                           Margin="8">
+                        <Label Text="{Binding Restaurant.Discount}" Style="{StaticResource BadgeLabel}" />
+                    </Frame>
+                </Grid>
+            </Frame>
+
+            <!-- Restaurant Details -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding Restaurant.Name}" FontSize="24" FontAttributes="Bold" />
+                <Label FontSize="14" TextColor="{StaticResource Gray500}">
+                    <Label.Text>
+                        <MultiBinding StringFormat="{}{0} • {1} • {2} delivery">
+                            <Binding Path="Restaurant.Tags[0]" />
+                            <Binding Path="Restaurant.DeliveryTime" />
+                            <Binding Path="Restaurant.DeliveryFee" />
+                        </MultiBinding>
+                    </Label.Text>
+                </Label>
+            </VerticalStackLayout>
+
+            <!-- Health Match -->
+            <Frame IsVisible="{Binding Restaurant.HealthMatch, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                   Style="{StaticResource CardFrame}" 
+                   BackgroundColor="{StaticResource Green50}" 
+                   BorderColor="{StaticResource Green100}">
+                <VerticalStackLayout Padding="12">
+                    <Label Text="Health Profile Match" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Green800}" />
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                        <Label Grid.Row="0" Grid.Column="0" Text="{Binding Restaurant.HealthMatch}" TextColor="{StaticResource Green800}" />
+                        
+                        <Frame Grid.Row="0" 
+                               Grid.Column="1" 
+                               HeightRequest="8" 
+                               Padding="0" 
+                               CornerRadius="4" 
+                               BackgroundColor="{StaticResource Green100}" 
+                               Margin="8,0,0,0">
+                            <Frame HorizontalOptions="Start" 
+                                   HeightRequest="8" 
+                                   WidthRequest="{Binding Restaurant.HealthMatch, Converter={StaticResource PercentToWidthConverter}, ConverterParameter=325}"
+                                   BackgroundColor="{StaticResource Green500}" 
+                                   CornerRadius="4" />
+                        </Frame>
+                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Restaurant.HealthReason}" TextColor="{StaticResource Green700}" FontSize="12" Margin="0,8,0,0" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Discount Reason -->
+            <Frame IsVisible="{Binding Restaurant.Discount, Converter={StaticResource StringNotNullOrEmptyConverter}}"
+                   Style="{StaticResource CardFrame}" 
+                   BackgroundColor="{StaticResource Blue50}" 
+                   BorderColor="{StaticResource Blue100}">
+                <VerticalStackLayout Padding="12">
+                    <Label Text="Your Health Discount" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource Blue800}" />
+                    <Label TextColor="{StaticResource Blue800}" Margin="0,8,0,0">
+                        <Label.Text>
+                            <MultiBinding StringFormat="You've earned {0} because of your achievement: {1}">
+                                <Binding Path="Restaurant.Discount" />
+                                <Binding Path="Restaurant.DiscountReason" />
+                            </MultiBinding>
+                        </Label.Text>
+                    </Label>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Popular Items -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Popular Items" FontSize="16" FontAttributes="Bold" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowSpacing="12" BindableLayout.ItemsSource="{Binding Restaurant.PopularItems}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Frame Grid.Column="{Binding BindingContext.ColumnIndex}" Style="{StaticResource CardFrame}">
+                                <Grid ColumnDefinitions="Auto,*" Padding="8">
+                                    <Frame CornerRadius="8" HeightRequest="64" WidthRequest="64" Padding="0" IsClippedToBounds="True">
+                                        <Image Source="{Binding Image}" Aspect="AspectFill" />
+                                    </Frame>
+                                    <VerticalStackLayout Grid.Column="1" Margin="12,0,0,0" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Price}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Information -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Information" FontSize="16" FontAttributes="Bold" />
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                        <Label Text="Address" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding Restaurant.Address}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                        <Label Text="Hours" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding Restaurant.Hours}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                        <Label Text="Phone" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding Restaurant.Phone}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                        <Label Text="Website" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding Restaurant.Website}" TextColor="{StaticResource Primary}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Reviews -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding Restaurant.Reviews, Converter={StaticResource CollectionNotEmptyConverter}}">
+                    <Label Text="Reviews" FontSize="16" FontAttributes="Bold" />
+                    <VerticalStackLayout Spacing="8" BindableLayout.ItemsSource="{Binding Restaurant.Reviews}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Style="{StaticResource CardFrame}" BorderColor="{StaticResource Gray200}">
+                                    <VerticalStackLayout Padding="12">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <Frame CornerRadius="12" HeightRequest="24" WidthRequest="24" BackgroundColor="{StaticResource Gray200}" Padding="0">
+                                                <Label Text="{Binding Name, Converter={StaticResource FirstCharConverter}}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            </Frame>
+                                            <Label Grid.Column="1" Text="{Binding Name}" FontAttributes="Bold" Margin="8,0,0,0" VerticalOptions="Center" />
+                                            <Frame Grid.Column="2" Style="{StaticResource BadgeFrame}" BackgroundColor="{StaticResource Green50}" BorderColor="{StaticResource Green100}">
+                                                <Label Text="{Binding Rating, StringFormat='{0} ★'}" TextColor="{StaticResource Green800}" FontSize="12" />
+                                            </Frame>
+                                        </Grid>
+                                        <Label Text="{Binding Comment}" TextColor="{StaticResource Gray600}" FontSize="12" Margin="0,8,0,0" />
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+                <!-- Start Order Button -->
+                <Button Text="Order"
+                        Command="{Binding commandBack}"
+                        CommandParameter="{Binding Restaurant.Id}" />
+            </VerticalStackLayout>
+    </ScrollView>
+        <Frame AbsoluteLayout.LayoutBounds="16,16,40,40"
+               AbsoluteLayout.LayoutFlags="None"
+               Padding="0"
+               CornerRadius="20"
+               HasShadow="True"
+               BackgroundColor="Transparent">
+                            <ImageButton
+                                    Source="iconback.jpg"
+                                    BackgroundColor="Transparent"
+                                    Clicked="OnBackButtonClicked" />
+        </Frame>
+    </AbsoluteLayout>
+</ContentPage>

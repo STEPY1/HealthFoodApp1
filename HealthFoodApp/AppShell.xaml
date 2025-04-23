@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="HealthFoodApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:HealthFoodApp.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Shell.NavBarIsVisible="False">
+
+    <TabBar>
+        <Tab Title="Home" Icon="homeiconillustrationimagevector.jpg">
+            <ShellContent ContentTemplate="{DataTemplate views:HomePage}" />
+        </Tab>
+        <Tab Title="Search" Icon="whitebackgroundsearchillustrationvector.jpg">
+            <ShellContent ContentTemplate="{DataTemplate views:SearchPage}" />
+        </Tab>
+        <Tab Title="View API">
+            <ShellContent ContentTemplate="{DataTemplate views:ViewAPiHttps}" />
+        </Tab>
+        <Tab Title="Browse" Icon="addd.jpg">
+            <ShellContent ContentTemplate="{DataTemplate views:BrowsePage}" />
+        </Tab>
+        <Tab Title="Account" Icon="images.png">
+            <ShellContent ContentTemplate="{DataTemplate views:AccountPage}" />
+        </Tab>
+    </TabBar>
+
+    <ShellContent
+        Route="RestaurantDetailPage"
+        ContentTemplate="{DataTemplate views:RestaurantDetailPage}"
+        Shell.NavBarIsVisible="True" />
+    
+    <ShellContent
+        Route="StartOrderPage"
+        ContentTemplate="{DataTemplate views:StartOrderPage}" 
+        Shell.NavBarIsVisible="True" />
+    
+    <ShellContent
+        Route="FoodDetailPage"
+        ContentTemplate="{DataTemplate views:FoodDetailPage}"
+        Shell.NavBarIsVisible="True" />
+</Shell>
